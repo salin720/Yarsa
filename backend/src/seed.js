@@ -1,0 +1,7 @@
+import dotenv from 'dotenv';import mongoose from 'mongoose';import bcrypt from 'bcryptjs';import path from 'path';import {fileURLToPath} from 'url';import User from './models/User.js';import Product from './models/Product.js';import Order from './models/Order.js';import {products} from './data.js';
+const __dirname=path.dirname(fileURLToPath(import.meta.url));dotenv.config({path:path.join(__dirname,'../.env')});
+await mongoose.connect(process.env.MONGO_URI);await User.deleteMany();await Product.deleteMany();await Order.deleteMany();
+const admin=await User.create({name:'YARSA Admin',email:process.env.ADMIN_EMAIL||'admin@yarsa.com',password:await bcrypt.hash(process.env.ADMIN_PASSWORD||'admin123',10),role:'admin',phone:'9800000000',address:'Kathmandu, Nepal'});
+const user=await User.create({name:'Demo User',email:'user@yarsa.com',password:await bcrypt.hash('user123',10),role:'user',phone:'9812345678',address:'Kathmandu, Nepal'});
+const saved=await Product.insertMany(products);await Order.create({user:user._id,items:[{product:saved[0]._id,name:saved[0].name,image:saved[0].images[0],size:'M',quantity:2,price:saved[0].price}],address:{firstName:'Demo',lastName:'User',email:'user@yarsa.com',street:'Main Street',city:'Kathmandu',state:'Bagmati',country:'Nepal',zipcode:'44600',phone:'9812345678'},amount:saved[0].price*2+10,paymentMethod:'COD',receiptNo:'YARSA-DEMO-1001',status:'Order Placed'});
+console.log('Seeded:',saved.length,'products');await mongoose.disconnect();

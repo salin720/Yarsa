@@ -1,0 +1,504 @@
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: #f6f7f9;
+    color: #202020
+}
+
+header {
+    height: 86px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px
+}
+
+.logo img {
+    width: 72px;
+    height: 54px;
+    object-fit: contain
+}
+
+.logo b {
+    font-size: 34px;
+    letter-spacing: 7px
+}
+
+.logo small {
+    display: block;
+    color: #c71221;
+    font-weight: 700
+}
+
+header button, .black {
+    background: #111;
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-weight: 800;
+    cursor: pointer
+}
+
+.layout {
+    display: grid;
+    grid-template-columns:300px 1fr;
+    min-height: calc(100vh - 86px)
+}
+
+aside {
+    background: #fff;
+    border-right: 1px solid #eee;
+    padding: 32px 18px
+}
+
+aside a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #222;
+    text-decoration: none;
+    border: 1px solid #eee;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    font-weight: 800;
+    border-radius: 12px
+}
+
+aside a.active, aside a:hover {
+    background: #fff0f2;
+    border-color: #c71221;
+    color: #c71221
+}
+
+.content {
+    padding: 42px;
+    max-width: 1320px
+}
+
+h1 {
+    margin-top: 0
+}
+
+.login {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff, #fff1f3)
+}
+
+.login form {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 24px;
+    box-shadow: 0 25px 80px #0002;
+    padding: 40px;
+    width: 430px
+}
+
+.login input, .add input, .add textarea, .add select, .profile input, .profile textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid #ddd;
+    margin: 9px 0 22px;
+    border-radius: 10px
+}
+
+.login button {
+    width: 100%;
+    border-radius: 12px;
+    background: #000;
+    color: #fff;
+    padding: 15px;
+    border: 0
+}
+
+.stats {
+    display: grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap: 20px
+}
+
+.stats article {
+    background: #fff;
+    padding: 26px;
+    border-radius: 22px;
+    box-shadow: 0 12px 35px #0000000d;
+    border: 1px solid #eee
+}
+
+.stats svg {
+    font-size: 38px;
+    color: #c71221
+}
+
+.stats span {
+    display: block;
+    color: #777;
+    margin-top: 12px
+}
+
+.stats b {
+    font-size: 32px
+}
+
+.panel {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 22px;
+    padding: 25px;
+    margin-top: 25px
+}
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 14px
+}
+
+.uploads {
+    display: flex;
+    gap: 14px;
+    margin: 15px 0 25px
+}
+
+.uploads label {
+    width: 135px;
+    height: 135px;
+    border: 1px dashed #cfcfcf;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    cursor: pointer
+}
+
+.uploads img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px
+}
+
+.uploads input {
+    display: none
+}
+
+.triple {
+    display: grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap: 20px
+}
+
+.sizes button {
+    border: 0;
+    background: #eceff3;
+    padding: 16px 22px;
+    margin-right: 12px;
+    border-radius: 10px;
+    cursor: pointer
+}
+
+.sizes .active {
+    background: #000;
+    color: #fff
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0
+}
+
+.check input {
+    width: auto;
+    margin: 0
+}
+
+.add .black {
+    border-radius: 0;
+    margin-top: 10px
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px #0000000d
+}
+
+th, td {
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 16px
+}
+
+td img {
+    width: 60px;
+    height: 78px;
+    object-fit: cover;
+    background: #f5f5f5
+}
+
+.actions {
+    display: flex;
+    gap: 12px
+}
+
+.actions a, .actions button {
+    border: 0;
+    background: #111;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px
+}
+
+.actions button {
+    background: #c71221
+}
+
+.order {
+    display: grid;
+    grid-template-columns:70px 1.5fr 1fr 120px 210px;
+    gap: 20px;
+    align-items: start;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    margin: 16px 0;
+    padding: 24px;
+    box-shadow: 0 10px 28px #0000000b
+}
+
+.pack {
+    font-size: 46px
+}
+
+.order select {
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px
+}
+
+.profile {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 680px
+}
+
+@media (max-width: 900px) {
+    .layout {
+        grid-template-columns:1fr
+    }
+
+    aside {
+        display: grid;
+        grid-template-columns:repeat(2, 1fr);
+        gap: 8px
+    }
+
+    .stats, .triple, .order {
+        grid-template-columns:1fr
+    }
+
+    header {
+        padding: 0 16px
+    }
+
+    .content {
+        padding: 20px
+    }
+}
+
+/* ===== Final requested fixes ===== */
+header {
+    height: 84px
+}
+
+.logo {
+    max-width: 220px;
+    overflow: hidden
+}
+
+.logo img {
+    width: 112px !important;
+    height: 46px !important;
+    object-fit: contain !important
+}
+
+.logo b {
+    font-size: 22px !important;
+    letter-spacing: 4px
+}
+
+.logo small {
+    font-size: 11px;
+    color: #777 !important
+}
+
+.login .logo {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px
+}
+
+.login .logo img {
+    width: 210px !important;
+    height: 85px !important
+}
+
+.login .logo b, .login .logo small {
+    display: none
+}
+
+.admin-order {
+    grid-template-columns:70px 1.6fr 1fr 120px 210px
+}
+
+.order-products {
+    display: grid;
+    gap: 12px
+}
+
+.admin-order-item {
+    display: grid;
+    grid-template-columns:64px 1fr;
+    gap: 12px;
+    align-items: center;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 8px
+}
+
+.admin-order-item img {
+    width: 64px;
+    height: 78px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f2f2f2
+}
+
+.admin-order-item p {
+    margin: 5px 0 0;
+    color: #666
+}
+
+@media (max-width: 900px) {
+    .admin-order {
+        grid-template-columns:1fr
+    }
+
+    .login .logo img {
+        width: 170px !important;
+        height: 70px !important
+    }
+}
+
+.logo {
+    width: 180px !important;
+    height: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.logo img {
+    width: 160px !important;
+    height: auto !important;
+    max-height: 70px !important;
+    object-fit: contain !important;
+}
+
+.product-thumb {
+    width: 72px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.order-product-img {
+    width: 72px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f5f5f5;
+}
+.admin-order {
+    display: grid;
+    grid-template-columns: 1.8fr 1.1fr 120px 220px;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.admin-order .pack {
+    display: none !important;
+}
+
+.order-products {
+    min-width: 0;
+}
+
+.admin-order-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    margin-bottom: 14px;
+}
+
+.admin-order-item img,
+.order-product-img {
+    width: 72px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.admin-order-item div {
+    line-height: 1.4;
+}
+
+.admin-order-item b {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.admin-order-item p {
+    margin: 0;
+    color: #555;
+}
+
+.admin-order select {
+    width: 170px;
+    height: 52px;
+}
+
+@media (max-width: 1000px) {
+    .admin-order {
+        grid-template-columns: 1fr;
+    }
+}
