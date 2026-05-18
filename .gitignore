@@ -1,7 +1,7 @@
 # dependencies
 node_modules
 
-# build
+# build output
 dist
 build
 .vite
@@ -14,3 +14,7 @@ build
 .env.*
 **/.env
 **/.env.*
+
+# OS
+.DS_Store
+Thumbs.db
