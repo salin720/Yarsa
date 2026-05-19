@@ -29,12 +29,12 @@ export default function Receipt() {
                             <td>
                                 {i.name} ({i.size}) x {i.quantity}
                             </td>
-                            <td>Rs{i.price * i.quantity}</td>
+                            <td>Rs {i.price * i.quantity}</td>
                         </tr>
                     ))}
                     <tr>
                         <th>Total</th>
-                        <th>Rs{o.amount}</th>
+                        <th>Rs {o.amount}</th>
                     </tr>
                 </tbody>
             </table>
