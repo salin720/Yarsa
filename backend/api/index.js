@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import authRoutes from '../src/routes/auth.js';
 import productRoutes from '../src/routes/products.js';
@@ -13,7 +15,11 @@ dotenv.config();
 
 const app = express();
 
-/* ---------------- CORS CONFIG ---------------- */
+/* ---------------- FIX: __dirname (IMPORTANT FOR RENDER) ---------------- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ---------------- FIX: CORS ---------------- */
 app.use(
     cors({
         origin: [
@@ -22,12 +28,18 @@ app.use(
             'https://yarsa-admin.vercel.app',
             'https://yarsa-frontend.vercel.app',
         ],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         credentials: true,
     })
 );
 
-/* ---------------- MIDDLEWARE ---------------- */
+/* ---------------- BODY PARSER ---------------- */
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ---------------- FIX: SERVE STATIC FILES (VERY IMPORTANT) ---------------- */
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 /* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
@@ -41,7 +53,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-/* ---------------- MONGODB CONNECTION ---------------- */
+/* ---------------- DB CONNECTION ---------------- */
 let isConnected = false;
 
 const connectDB = async () => {
@@ -64,9 +76,9 @@ const connectDB = async () => {
 
 connectDB();
 
-/* ---------------- GLOBAL ERROR HANDLER ---------------- */
+/* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
-    console.error('Server Error:', err.message);
+    console.error('Server Error:', err);
     res.status(500).json({
         error: err.message || 'Server crashed',
     });
