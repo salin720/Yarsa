@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {toast} from 'react-toastify';
-import {FiPackage} from 'react-icons/fi';
-import {api} from '../services/api.js';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { FiPackage } from 'react-icons/fi';
+import { api } from '../services/api.js';
 import logo from '../assets/yarsa-logo.jpg';
 
 const getImageUrl = (path) => {
@@ -18,7 +18,9 @@ export default function Orders() {
     const load = async (pg = 1, more = false) => {
         try {
             const res = await api.get('/api/orders?page=' + pg + '&limit=20');
-            setOrders(prev => more ? [...prev, ...res.data.items] : res.data.items);
+            setOrders((prev) =>
+                more ? [...prev, ...res.data.items] : res.data.items
+            );
             setPage(pg);
             setPages(res.data.pages);
         } catch (err) {
@@ -33,7 +35,7 @@ export default function Orders() {
 
     async function status(id, s) {
         try {
-            await api.put('/api/orders/' + id + '/status', {status: s});
+            await api.put('/api/orders/' + id + '/status', { status: s });
             toast.success('Order status updated');
             load();
         } catch (err) {
@@ -46,9 +48,8 @@ export default function Orders() {
         <>
             <h1>Order Page</h1>
 
-            {orders.map(o => (
+            {orders.map((o) => (
                 <div className="order admin-order" key={o._id}>
-
                     <div className="order-products">
                         {o.items.map((i, k) => (
                             <div className="admin-order-item" key={k}>
@@ -64,21 +65,27 @@ export default function Orders() {
 
                                 <div>
                                     <b>{i.name}</b>
-                                    <p>Qty: {i.quantity} | Size: {i.size}</p>
+                                    <p>
+                                        Qty: {i.quantity} | Size: {i.size}
+                                    </p>
                                 </div>
                             </div>
                         ))}
 
-                        <b>{o.address?.firstName} {o.address?.lastName}</b>
+                        <b>
+                            {o.address?.firstName} {o.address?.lastName}
+                        </b>
                         <p>
                             {o.address?.street}, {o.address?.city}
-                            <br/>
+                            <br />
                             {o.address?.phone}
                         </p>
                     </div>
 
                     <div>
-                        <p>Items: {o.items.reduce((s, i) => s + i.quantity, 0)}</p>
+                        <p>
+                            Items: {o.items.reduce((s, i) => s + i.quantity, 0)}
+                        </p>
                         <p>Method: {o.paymentMethod}</p>
                         <p>Payment: {o.payment ? 'Done' : 'Pending'}</p>
                         <p>Date: {new Date(o.date).toLocaleString()}</p>
@@ -87,7 +94,10 @@ export default function Orders() {
 
                     <h3>${o.amount}</h3>
 
-                    <select value={o.status} onChange={e => status(o._id, e.target.value)}>
+                    <select
+                        value={o.status}
+                        onChange={(e) => status(o._id, e.target.value)}
+                    >
                         <option>Order Placed</option>
                         <option>Packing</option>
                         <option>Shipped</option>

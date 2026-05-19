@@ -20,7 +20,9 @@ export default function List() {
         try {
             const res = await api.get('/api/products?page=' + pg + '&limit=20');
 
-            setProducts((prev) => (more ? [...prev, ...res.data.items] : res.data.items));
+            setProducts((prev) =>
+                more ? [...prev, ...res.data.items] : res.data.items
+            );
             setPage(pg);
             setPages(res.data.pages);
         } catch (err) {
@@ -52,47 +54,47 @@ export default function List() {
 
             <table>
                 <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Action</th>
-                </tr>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Action</th>
+                    </tr>
                 </thead>
 
                 <tbody>
-                {products.map((p) => (
-                    <tr key={p._id}>
-                        <td>
-                            <img
-                                src={getImageUrl(p.images?.[0])}
-                                alt=""
-                                className="product-thumb"
-                                onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = logo;
-                                }}
-                            />
-                        </td>
+                    {products.map((p) => (
+                        <tr key={p._id}>
+                            <td>
+                                <img
+                                    src={getImageUrl(p.images?.[0])}
+                                    alt=""
+                                    className="product-thumb"
+                                    onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = logo;
+                                    }}
+                                />
+                            </td>
 
-                        <td>{p.name}</td>
-                        <td>{p.category}</td>
-                        <td>${p.price}</td>
-                        <td>{p.stock}</td>
+                            <td>{p.name}</td>
+                            <td>{p.category}</td>
+                            <td>${p.price}</td>
+                            <td>{p.stock}</td>
 
-                        <td className="actions">
-                            <Link to={'/edit/' + p._id}>
-                                <FiEdit2 />
-                            </Link>
+                            <td className="actions">
+                                <Link to={'/edit/' + p._id}>
+                                    <FiEdit2 />
+                                </Link>
 
-                            <button onClick={() => del(p._id)}>
-                                <FiTrash2 />
-                            </button>
-                        </td>
-                    </tr>
-                ))}
+                                <button onClick={() => del(p._id)}>
+                                    <FiTrash2 />
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 

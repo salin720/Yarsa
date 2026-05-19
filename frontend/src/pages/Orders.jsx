@@ -4,13 +4,54 @@ import {api, img} from '../services/api.js';
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
+
     useEffect(() => {
-        api.get('/api/orders/my').then(r => setOrders(r.data)).catch(() => {
-        })
+        api.get('/api/orders/my')
+            .then(r => setOrders(r.data))
+            .catch(() => {
+            });
     }, []);
-    return <section><h1 className="page-title">MY ORDERS</h1>{orders.map(o => o.items.map((i, idx) => <div
-        className="order-line" key={o._id + idx}><img src={img(i.image)}/>
-        <div><h3>{i.name}</h3><p>Rs{i.price} Quantity: {i.quantity} Size: {i.size}</p>
-            <p>Date: {new Date(o.date).toLocaleString()}</p><p>Payment: {o.paymentMethod}</p></div>
-        <span className="dot"/> <b>{o.status}</b><Link to={'/receipt/' + o._id}>Receipt</Link></div>))}</section>
+
+    return (
+        <section>
+            <h1 className="page-title">MY ORDERS</h1>
+
+            {orders.map(o =>
+                o.items.map((i, idx) => (
+                    <div
+                        className="order-line"
+                        key={o._id + idx}
+                    >
+                        <img src={img(i.image)}/>
+
+                        <div>
+                            <h3>{i.name}</h3>
+
+                            <p>
+                                Rs{i.price} | Quantity: {i.quantity} |
+                                Size: {i.size}
+                            </p>
+
+                            <p>
+                                Date:{' '}
+                                {new Date(o.date).toLocaleString()}
+                            </p>
+
+                            <p>
+                                Payment: {o.paymentMethod}
+                            </p>
+                        </div>
+
+                        <span className="dot"/>
+
+                        <b>{o.status}</b>
+
+                        <Link to={'/receipt/' + o._id}>
+                            Receipt
+                        </Link>
+                    </div>
+                ))
+            )}
+        </section>
+    );
 }

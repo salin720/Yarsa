@@ -1,2 +1,73 @@
-import React from'react';import{FiRefreshCcw,FiCheckCircle,FiHeadphones,FiInstagram,FiFacebook,FiSend}from'react-icons/fi';import logo from'../assets/yarsa-logo.jpg';
-export default function Footer(){return <footer><section className="perks"><article><FiRefreshCcw/><h3>Easy Exchange</h3><p>Hassle-free exchange policy</p></article><article><FiCheckCircle/><h3>7 Days Return</h3><p>Free return support</p></article><article><FiHeadphones/><h3>Premium Support</h3><p>24/7 customer care</p></article></section><section className="newsletter"><h2>Subscribe now & get 20% off</h2><p>Join YARSA members for offers, launches and fashion updates.</p><form><input placeholder="Enter your email"/><button>Subscribe</button></form></section><div className="footgrid"><div><img src={logo}/><p>YARSA is a premium black, white and red ecommerce fashion platform built with MERN stack.</p></div><div><h3>Company</h3><a>Home</a><a>About us</a><a>Delivery</a><a>Privacy policy</a></div><div><h3>Get in touch</h3><p>+977-9800000000</p><p>support@yarsa.com</p><div className="social"><FiInstagram/><FiFacebook/><FiSend/></div></div></div><p className="copy">Copyright 2026 © yarsa.com - All Rights Reserved.</p></footer>}
+import React from 'react';
+import {
+    FiRefreshCcw,
+    FiCheckCircle,
+    FiHeadphones,
+    FiInstagram,
+    FiFacebook,
+    FiSend,
+} from 'react-icons/fi';
+import logo from '../assets/yarsa-logo.jpg';
+
+export default function Footer() {
+    return (
+        <footer>
+            <section className="perks">
+                <article>
+                    <FiRefreshCcw />
+                    <h3>Easy Exchange</h3>
+                    <p>Hassle-free exchange policy</p>
+                </article>
+                <article>
+                    <FiCheckCircle />
+                    <h3>7 Days Return</h3>
+                    <p>Free return support</p>
+                </article>
+                <article>
+                    <FiHeadphones />
+                    <h3>Premium Support</h3>
+                    <p>24/7 customer care</p>
+                </article>
+            </section>
+            <section className="newsletter">
+                <h2>Subscribe now & get 20% off</h2>
+                <p>
+                    Join YARSA members for offers, launches and fashion updates.
+                </p>
+                <form>
+                    <input placeholder="Enter your email" />
+                    <button>Subscribe</button>
+                </form>
+            </section>
+            <div className="footgrid">
+                <div>
+                    <img src={logo} />
+                    <p>
+                        YARSA delivers trendy, comfortable, affordable fashion
+                        designed for confident everyday style.
+                    </p>
+                </div>
+                <div>
+                    <h3>Company</h3>
+                    <a>Home</a>
+                    <a>About us</a>
+                    <a>Delivery</a>
+                    <a>Privacy policy</a>
+                </div>
+                <div>
+                    <h3>Get in touch</h3>
+                    <p>+977-9800000000</p>
+                    <p>support@yarsa.com</p>
+                    <div className="social">
+                        <FiInstagram />
+                        <FiFacebook />
+                        <FiSend />
+                    </div>
+                </div>
+            </div>
+            <p className="copy">
+                Copyright 2026 © yarsa.com - All Rights Reserved.
+            </p>
+        </footer>
+    );
+}

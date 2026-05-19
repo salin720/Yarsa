@@ -1,2 +1,17 @@
-import React from 'react';import{createRoot}from'react-dom/client';import{BrowserRouter}from'react-router-dom';import{ToastContainer}from'react-toastify';import'./style.css';import'react-toastify/dist/ReactToastify.css';import App from './App.jsx';import{StoreProvider}from './context/StoreContext.jsx';
-createRoot(document.getElementById('root')).render(<BrowserRouter><StoreProvider><App/><ToastContainer position="top-right"/></StoreProvider></BrowserRouter>);
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import './style.css';
+import 'react-toastify/dist/ReactToastify.css';
+import App from './App.jsx';
+import { StoreProvider } from './context/StoreContext.jsx';
+
+createRoot(document.getElementById('root')).render(
+    <BrowserRouter>
+        <StoreProvider>
+            <App />
+            <ToastContainer position="top-right" />
+        </StoreProvider>
+    </BrowserRouter>
+);

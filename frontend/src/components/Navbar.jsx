@@ -8,7 +8,7 @@ import {
     FiX,
     FiHeart,
     FiPackage,
-    FiLogOut
+    FiLogOut,
 } from 'react-icons/fi';
 import logo from '../assets/yarsa-logo.jpg';
 import { useStore } from '../context/StoreContext.jsx';
@@ -43,24 +43,35 @@ export default function Navbar() {
                 </nav>
 
                 <div className="nav-icons">
-                    <button onClick={() => nav('/collection')}><FiSearch /></button>
+                    <button onClick={() => nav('/collection')}>
+                        <FiSearch />
+                    </button>
 
                     <button className="bag" onClick={() => nav('/wishlist')}>
                         <FiHeart />
                         {wishCount > 0 && <span>{wishCount}</span>}
                     </button>
 
-                    <button onClick={() => nav('/orders')}><FiPackage /></button>
+                    <button onClick={() => nav('/orders')}>
+                        <FiPackage />
+                    </button>
 
                     {user ? (
                         <>
-                            <button onClick={() => nav('/profile')}><FiUser /></button>
-                            <button onClick={() => setShowLogout(true)} title="Logout">
+                            <button onClick={() => nav('/profile')}>
+                                <FiUser />
+                            </button>
+                            <button
+                                onClick={() => setShowLogout(true)}
+                                title="Logout"
+                            >
                                 <FiLogOut />
                             </button>
                         </>
                     ) : (
-                        <button onClick={() => nav('/login')}><FiUser /></button>
+                        <button onClick={() => nav('/login')}>
+                            <FiUser />
+                        </button>
                     )}
 
                     <button className="bag" onClick={() => nav('/cart')}>
@@ -82,14 +93,23 @@ export default function Navbar() {
                         </div>
 
                         <h2>Logout?</h2>
-                        <p>Are you sure you want to logout from your YARSA account?</p>
+                        <p>
+                            Are you sure you want to logout from your YARSA
+                            account?
+                        </p>
 
                         <div className="logout-actions">
-                            <button className="cancel-btn" onClick={() => setShowLogout(false)}>
+                            <button
+                                className="cancel-btn"
+                                onClick={() => setShowLogout(false)}
+                            >
                                 Cancel
                             </button>
 
-                            <button className="confirm-btn" onClick={confirmLogout}>
+                            <button
+                                className="confirm-btn"
+                                onClick={confirmLogout}
+                            >
                                 Yes, Logout
                             </button>
                         </div>

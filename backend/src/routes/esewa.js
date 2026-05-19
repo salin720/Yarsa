@@ -31,7 +31,7 @@ router.post('/initiate', (req, res) => {
         success_url: 'http://localhost:5173/payment-success',
         failure_url: 'http://localhost:5173/payment-failed',
         signed_field_names: signedFieldNames,
-        signature
+        signature,
     });
 });
 

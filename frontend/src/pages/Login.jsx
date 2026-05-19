@@ -45,29 +45,29 @@ export default function Login() {
                 {mode === 'register' && (
                     <>
                         <label className="auth-field">
-                            <FiUser />
-                            <input name="name" placeholder="Full name" required />
+                            <FiUser/>
+                            <input name="name" placeholder="Full name" required/>
                         </label>
 
                         <label className="auth-field">
-                            <FiPhone />
-                            <input name="phone" placeholder="Phone number" required />
+                            <FiPhone/>
+                            <input name="phone" placeholder="Phone number" required/>
                         </label>
 
                         <label className="auth-field">
-                            <FiMapPin />
-                            <input name="address" placeholder="Address" required />
+                            <FiMapPin/>
+                            <input name="address" placeholder="Address" required/>
                         </label>
                     </>
                 )}
 
                 <label className="auth-field">
-                    <FiMail />
-                    <input name="email" type="email" placeholder="Email" required />
+                    <FiMail/>
+                    <input name="email" type="email" placeholder="Email" required/>
                 </label>
 
                 <label className="auth-field">
-                    <FiLock />
+                    <FiLock/>
                     <input
                         name="password"
                         type={showPass ? 'text' : 'password'}
@@ -75,7 +75,7 @@ export default function Login() {
                         required
                     />
                     <button type="button" onClick={() => setShowPass(!showPass)}>
-                        {showPass ? <FiEyeOff /> : <FiEye />}
+                        {showPass ? <FiEyeOff/> : <FiEye/>}
                     </button>
                 </label>
 

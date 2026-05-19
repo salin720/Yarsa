@@ -3,7 +3,7 @@ import axios from 'axios';
 const API = 'http://localhost:5001';
 
 export const api = axios.create({
-    baseURL: API
+    baseURL: API,
 });
 
 export const img = (path) => {

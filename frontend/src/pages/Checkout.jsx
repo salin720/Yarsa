@@ -6,7 +6,9 @@ import {useStore} from '../context/StoreContext.jsx';
 
 export default function Checkout() {
     const {cart, total, clear, user} = useStore();
+
     const [method, setMethod] = useState('COD');
+
     const nav = useNavigate();
 
     const redirectToEsewa = async () => {
@@ -19,21 +21,27 @@ export default function Checkout() {
             });
 
             const form = document.createElement('form');
+
             form.method = 'POST';
-            form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
+            form.action =
+                'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
 
             Object.entries(res.data).forEach(([key, value]) => {
                 const input = document.createElement('input');
+
                 input.type = 'hidden';
                 input.name = key;
                 input.value = value;
+
                 form.appendChild(input);
             });
 
             document.body.appendChild(form);
+
             form.submit();
         } catch (err) {
             console.log(err);
+
             toast.error('Could not redirect to eSewa');
         }
     };
@@ -43,20 +51,26 @@ export default function Checkout() {
 
         if (!user || !localStorage.getItem('token')) {
             toast.error('Please login before checkout');
+
             nav('/login');
+
             return;
         }
 
         if (!cart.length) {
             toast.error('Your cart is empty');
+
             return;
         }
 
-        const address = Object.fromEntries(new FormData(e.currentTarget));
+        const address = Object.fromEntries(
+            new FormData(e.currentTarget)
+        );
 
         try {
             if (method === 'Esewa') {
                 await redirectToEsewa();
+
                 return;
             }
 
@@ -68,14 +82,19 @@ export default function Checkout() {
             });
 
             toast.success('Order placed successfully');
+
             clear();
+
             nav('/receipt/' + r.data._id);
         } catch (err) {
             if (err.response?.status === 401) {
                 toast.error('Session expired. Please login again.');
+
                 nav('/login');
             } else {
-                toast.error(err.response?.data?.message || 'Order failed');
+                toast.error(
+                    err.response?.data?.message || 'Order failed'
+                );
             }
         }
     }
@@ -83,11 +102,22 @@ export default function Checkout() {
     return (
         <section className="checkout pro-checkout">
             <form onSubmit={submit} className="checkout-form">
-                <h1 className="page-title">DELIVERY INFORMATION</h1>
+                <h1 className="page-title">
+                    DELIVERY INFORMATION
+                </h1>
 
                 <div className="two">
-                    <input name="firstName" placeholder="First name" required/>
-                    <input name="lastName" placeholder="Last name" required/>
+                    <input
+                        name="firstName"
+                        placeholder="First name"
+                        required
+                    />
+
+                    <input
+                        name="lastName"
+                        placeholder="Last name"
+                        required
+                    />
                 </div>
 
                 <input
@@ -97,19 +127,43 @@ export default function Checkout() {
                     required
                 />
 
-                <input name="street" placeholder="Street" required/>
+                <input
+                    name="street"
+                    placeholder="Street"
+                    required
+                />
 
                 <div className="two">
-                    <input name="city" placeholder="City" required/>
-                    <input name="state" placeholder="State"/>
+                    <input
+                        name="city"
+                        placeholder="City"
+                        required
+                    />
+
+                    <input
+                        name="state"
+                        placeholder="State"
+                    />
                 </div>
 
                 <div className="two">
-                    <input name="zipcode" placeholder="Zipcode"/>
-                    <input name="country" placeholder="Country" defaultValue="Nepal"/>
+                    <input
+                        name="zipcode"
+                        placeholder="Zipcode"
+                    />
+
+                    <input
+                        name="country"
+                        placeholder="Country"
+                        defaultValue="Nepal"
+                    />
                 </div>
 
-                <input name="phone" placeholder="Phone" required/>
+                <input
+                    name="phone"
+                    placeholder="Phone"
+                    required
+                />
             </form>
 
             <aside className="totals checkout-card">
@@ -132,7 +186,11 @@ export default function Checkout() {
                 <div className="pay">
                     <button
                         type="button"
-                        className={method === 'Esewa' ? 'active' : ''}
+                        className={
+                            method === 'Esewa'
+                                ? 'active'
+                                : ''
+                        }
                         onClick={() => setMethod('Esewa')}
                     >
                         eSewa
@@ -140,7 +198,11 @@ export default function Checkout() {
 
                     <button
                         type="button"
-                        className={method === 'COD' ? 'active' : ''}
+                        className={
+                            method === 'COD'
+                                ? 'active'
+                                : ''
+                        }
                         onClick={() => setMethod('COD')}
                     >
                         Cash on Delivery
@@ -153,7 +215,11 @@ export default function Checkout() {
 
                 <button
                     className="black"
-                    onClick={() => document.querySelector('.checkout form').requestSubmit()}
+                    onClick={() =>
+                        document
+                            .querySelector('.checkout form')
+                            .requestSubmit()
+                    }
                 >
                     PLACE ORDER
                 </button>

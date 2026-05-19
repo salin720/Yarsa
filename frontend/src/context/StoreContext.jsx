@@ -1,5 +1,5 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
-import {toast} from 'react-toastify';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const C = createContext();
 
@@ -17,7 +17,7 @@ const getUserKey = (user) => {
     return user?._id || user?.email || 'guest';
 };
 
-export function StoreProvider({children}) {
+export function StoreProvider({ children }) {
     const [user, setUser] = useState(() => safeParse(localStorage.user, null));
 
     const currentUserKey = getUserKey(user);
@@ -46,7 +46,10 @@ export function StoreProvider({children}) {
     }, [cart, currentUserKey]);
 
     useEffect(() => {
-        localStorage.setItem(`wishlist_${currentUserKey}`, JSON.stringify(wishlist));
+        localStorage.setItem(
+            `wishlist_${currentUserKey}`,
+            JSON.stringify(wishlist)
+        );
     }, [wishlist, currentUserKey]);
 
     useEffect(() => {
@@ -61,12 +64,14 @@ export function StoreProvider({children}) {
     const wishCount = wishlist.length;
 
     const add = (product, size = 'M') => {
-        setCart(c => {
-            const k = c.find(x => x.product === product._id && x.size === size);
+        setCart((c) => {
+            const k = c.find(
+                (x) => x.product === product._id && x.size === size
+            );
 
             if (k) {
-                return c.map(x =>
-                    x === k ? {...x, quantity: x.quantity + 1} : x
+                return c.map((x) =>
+                    x === k ? { ...x, quantity: x.quantity + 1 } : x
                 );
             }
 
@@ -78,8 +83,8 @@ export function StoreProvider({children}) {
                     image: product.images?.[0],
                     price: product.price,
                     size,
-                    quantity: 1
-                }
+                    quantity: 1,
+                },
             ];
         });
 
@@ -87,19 +92,17 @@ export function StoreProvider({children}) {
     };
 
     const update = (i, q) => {
-        setCart(c =>
+        setCart((c) =>
             c
-                .map((x, idx) =>
-                    idx === i ? {...x, quantity: +q} : x
-                )
-                .filter(x => x.quantity > 0)
+                .map((x, idx) => (idx === i ? { ...x, quantity: +q } : x))
+                .filter((x) => x.quantity > 0)
         );
 
         toast.info('Cart updated');
     };
 
-    const remove = i => {
-        setCart(c => c.filter((_, idx) => idx !== i));
+    const remove = (i) => {
+        setCart((c) => c.filter((_, idx) => idx !== i));
         toast.warn('Removed from cart');
     };
 
@@ -109,16 +112,16 @@ export function StoreProvider({children}) {
 
     const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
-    const toggleWish = p => {
-        setWishlist(w => {
-            const exists = w.some(x => x._id === p._id);
+    const toggleWish = (p) => {
+        setWishlist((w) => {
+            const exists = w.some((x) => x._id === p._id);
 
             toast[exists ? 'info' : 'success'](
                 exists ? 'Removed from wishlist' : 'Added to wishlist'
             );
 
             if (exists) {
-                return w.filter(x => x._id !== p._id);
+                return w.filter((x) => x._id !== p._id);
             }
 
             return [
@@ -132,17 +135,17 @@ export function StoreProvider({children}) {
                     ratingAvg: p.ratingAvg,
                     ratingCount: p.ratingCount,
                     sizes: p.sizes,
-                    bestseller: p.bestseller
+                    bestseller: p.bestseller,
                 },
-                ...w
+                ...w,
             ];
         });
     };
 
-    const inWish = id => wishlist.some(x => x._id === id);
+    const inWish = (id) => wishlist.some((x) => x._id === id);
 
-    const removeWish = id => {
-        setWishlist(w => w.filter(x => x._id !== id));
+    const removeWish = (id) => {
+        setWishlist((w) => w.filter((x) => x._id !== id));
         toast.info('Removed from wishlist');
     };
 
@@ -162,7 +165,7 @@ export function StoreProvider({children}) {
                 wishCount,
                 toggleWish,
                 inWish,
-                removeWish
+                removeWish,
             }}
         >
             {children}

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Routes, Route} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
@@ -16,16 +16,26 @@ import Receipt from './pages/Receipt.jsx';
 import Wishlist from './pages/Wishlist.jsx';
 
 export default function App() {
-    return <><Navbar/>
-        <main><Routes><Route path="/" element={<Home/>}/><Route path="/collection" element={<Collection/>}/><Route
-            path="/product/:id" element={<Product/>}/><Route path="/cart" element={<Cart/>}/><Route path="/checkout"
-                                                                                                    element={
-                                                                                                        <Checkout/>}/><Route
-            path="/login" element={<Login/>}/><Route path="/orders" element={<Orders/>}/><Route path="/wishlist"
-                                                                                                element={
-                                                                                                    <Wishlist/>}/><Route
-            path="/profile" element={<Profile/>}/><Route path="/about" element={<About/>}/><Route path="/contact"
-                                                                                                  element={<Contact/>}/><Route
-            path="/receipt/:id" element={<Receipt/>}/></Routes></main>
-        <Footer/></>
+    return (
+        <>
+            <Navbar />
+            <main>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/collection" element={<Collection />} />
+                    <Route path="/product/:id" element={<Product />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/receipt/:id" element={<Receipt />} />
+                </Routes>
+            </main>
+            <Footer />
+        </>
+    );
 }

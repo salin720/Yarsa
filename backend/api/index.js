@@ -14,12 +14,12 @@ dotenv.config();
 const app = express();
 
 /* ---------------- MIDDLEWARE ---------------- */
-app.use(cors({origin: '*', credentials: true}));
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
 /* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
-    res.json({message: 'Backend working 🚀'});
+    res.json({ message: 'Backend working 🚀' });
 });
 
 /* ---------------- ROUTES ---------------- */
@@ -56,7 +56,7 @@ connectDB();
 /* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
     console.error(err);
-    res.status(500).json({error: 'Server crashed'});
+    res.status(500).json({ error: 'Server crashed' });
 });
 
 /* ---------------- START SERVER ---------------- */

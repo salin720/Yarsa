@@ -1,10 +1,10 @@
 import express from 'express';
 import multer from 'multer';
 import Product from '../models/Product.js';
-import {auth, admin} from '../middleware/auth.js';
+import { auth, admin } from '../middleware/auth.js';
 
 const upload = multer({
-    storage: multer.memoryStorage()
+    storage: multer.memoryStorage(),
 });
 
 const r = express.Router();
@@ -18,52 +18,52 @@ r.get('/', async (req, res) => {
         sort,
         page = 1,
         limit = 20,
-        bestseller
+        bestseller,
     } = req.query;
 
     let q = {};
 
-    if (category) q.category = {$in: String(category).split(',')};
-    if (subCategory) q.subCategory = {$in: String(subCategory).split(',')};
+    if (category) q.category = { $in: String(category).split(',') };
+    if (subCategory) q.subCategory = { $in: String(subCategory).split(',') };
     if (bestseller) q.bestseller = true;
 
     if (search) {
         q.$or = [
-            {name: {$regex: search, $options: 'i'}},
-            {description: {$regex: search, $options: 'i'}}
+            { name: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
         ];
     }
 
-    let s = {createdAt: -1};
-    if (sort === 'low-high') s = {price: 1};
-    if (sort === 'high-low') s = {price: -1};
-    if (sort === 'rating') s = {ratingAvg: -1};
+    let s = { createdAt: -1 };
+    if (sort === 'low-high') s = { price: 1 };
+    if (sort === 'high-low') s = { price: -1 };
+    if (sort === 'rating') s = { ratingAvg: -1 };
 
-    const skip = (+page - 1) * (+limit);
+    const skip = (+page - 1) * +limit;
 
     const [items, total] = await Promise.all([
         Product.find(q).sort(s).skip(skip).limit(+limit),
-        Product.countDocuments(q)
+        Product.countDocuments(q),
     ]);
 
     res.json({
         items,
         total,
         page: +page,
-        pages: Math.ceil(total / (+limit))
+        pages: Math.ceil(total / +limit),
     });
 });
 
 /* ---------------- FEATURED ---------------- */
 r.get('/featured', async (req, res) => {
-    const items = await Product.find({featured: true}).limit(10);
+    const items = await Product.find({ featured: true }).limit(10);
     res.json(items);
 });
 
 /* ---------------- GET SINGLE ---------------- */
 r.get('/:id', async (req, res) => {
     const p = await Product.findById(req.params.id);
-    if (!p) return res.status(404).json({message: 'Product not found'});
+    if (!p) return res.status(404).json({ message: 'Product not found' });
     res.json(p);
 });
 
@@ -72,10 +72,10 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
     const b = req.body;
 
     // TEMP: memory storage (no file saving)
-    const uploaded = (req.files || []).map(file => ({
+    const uploaded = (req.files || []).map((file) => ({
         name: file.originalname,
         type: file.mimetype,
-        size: file.size
+        size: file.size,
     }));
 
     const product = await Product.create({
@@ -90,7 +90,7 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
         stock: +(b.stock || 50),
 
         // TEMP FIX (no filesystem usage)
-        images: uploaded.length ? uploaded : JSON.parse(b.images || '[]')
+        images: uploaded.length ? uploaded : JSON.parse(b.images || '[]'),
     });
 
     res.json(product);
@@ -99,7 +99,7 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
 /* ---------------- UPDATE PRODUCT ---------------- */
 r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
     const b = req.body;
-    let update = {...b};
+    let update = { ...b };
 
     if (b.sizes) update.sizes = JSON.parse(b.sizes);
     if (b.price) update.price = +b.price;
@@ -107,14 +107,16 @@ r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
 
     // TEMP FIX
     if (req.files?.length) {
-        update.images = req.files.map(file => ({
+        update.images = req.files.map((file) => ({
             name: file.originalname,
             type: file.mimetype,
-            size: file.size
+            size: file.size,
         }));
     }
 
-    const p = await Product.findByIdAndUpdate(req.params.id, update, {new: true});
+    const p = await Product.findByIdAndUpdate(req.params.id, update, {
+        new: true,
+    });
 
     res.json(p);
 });
@@ -122,28 +124,29 @@ r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
 /* ---------------- DELETE ---------------- */
 r.delete('/:id', auth, admin, async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
-    res.json({message: 'Product deleted'});
+    res.json({ message: 'Product deleted' });
 });
 
 /* ---------------- REVIEWS ---------------- */
 r.post('/:id/reviews', auth, async (req, res) => {
     const p = await Product.findById(req.params.id);
 
-    if (!p)
-        return res.status(404).json({message: 'Product not found'});
+    if (!p) return res.status(404).json({ message: 'Product not found' });
 
     const exists = p.reviews.find(
-        x => String(x.user) === String(req.user._id)
+        (x) => String(x.user) === String(req.user._id)
     );
 
     if (exists)
-        return res.status(400).json({message: 'You already reviewed this product'});
+        return res
+            .status(400)
+            .json({ message: 'You already reviewed this product' });
 
     p.reviews.push({
         user: req.user._id,
         name: req.user.name,
         rating: +req.body.rating,
-        comment: req.body.comment
+        comment: req.body.comment,
     });
 
     p.ratingCount = p.reviews.length;
