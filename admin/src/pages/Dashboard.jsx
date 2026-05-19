@@ -26,7 +26,7 @@ export default function Dashboard() {
             <h1>Dashboard Analytics</h1>
             <div className="stats">
                 <article>
-                    <FiDollarSign />
+                    <FiCreditCard />
                     <span>Revenue</span>
                     <b>Rs {d.revenue}</b>
                 </article>
