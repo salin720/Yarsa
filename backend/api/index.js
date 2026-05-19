@@ -5,11 +5,11 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import authRoutes from '../routes/auth.js';
-import productRoutes from '../routes/products.js';
-import orderRoutes from '../routes/orders.js';
-import dashboardRoutes from '../routes/dashboard.js';
-import esewaRoutes from '../routes/esewa.js';
+import authRoutes from '../src/routes/auth.js';
+import productRoutes from '../src/routes/products.js';
+import orderRoutes from '../src/routes/orders.js';
+import dashboardRoutes from '../src/routes/dashboard.js';
+import esewaRoutes from '../src/routes/esewa.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,22 +43,28 @@ app.use(
 
 app.use(express.json({ limit: '10mb' }));
 
+// Static uploads folder
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Home route
 app.get('/', (req, res) => {
     res.json({ message: 'YARSA MERN backend running' });
 });
 
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
+// MongoDB Connection
 if (!mongoose.connections[0].readyState) {
-    mongoose.connect(process.env.MONGO_URI)
+    mongoose
+        .connect(process.env.MONGO_URI)
         .then(() => console.log('MongoDB connected'))
-        .catch((e) => console.error(e));
+        .catch((e) => console.error('MongoDB Error:', e.message));
 }
 
+// Export for Vercel
 export default app;
