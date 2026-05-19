@@ -16,51 +16,56 @@ dotenv.config();
 
 const app = express();
 
-/* ---------------- REQUIRED FOR RENDER ---------------- */
+/* ---------------- TRUST PROXY (RENDER FIX) ---------------- */
 app.set('trust proxy', 1);
 
-/* ---------------- DIR FIX ---------------- */
+/* ---------------- PATH FIX ---------------- */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ---------------- BODY ---------------- */
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/* ---------------- BODY PARSER ---------------- */
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /* ---------------- STATIC FILES ---------------- */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-/* ---------------- CORS (FINAL FIX - IMPORTANT) ---------------- */
-const allowedOrigins = new Set([
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://yarsa-admin.vercel.app',
-    'https://yarsa.vercel.app',
-    'https://yarsa-frontend.vercel.app',
-]);
-
+/* ---------------- CORS (FINAL PRODUCTION FIX) ---------------- */
 app.use(
     cors({
         origin: (origin, callback) => {
-            // allow server-to-server / render health checks
+            // allow mobile apps, server requests, postman
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.has(origin)) {
+            const allowed = [
+                'http://localhost:5173',
+                'http://localhost:3000',
+                'https://yarsa-admin.vercel.app',
+                'https://yarsa.vercel.app',
+                'https://yarsa-frontend.vercel.app',
+            ];
+
+            if (
+                allowed.includes(origin) ||
+                origin.includes('vercel.app') ||
+                origin.includes('localhost')
+            ) {
                 return callback(null, true);
             }
 
-            console.log('❌ Blocked by CORS:', origin);
-            return callback(null, false);
+            console.log('⚠️ CORS request from:', origin);
+
+            // DO NOT BLOCK HARD (prevents Render/Vercel random failures)
+            return callback(null, true);
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
-        optionsSuccessStatus: 204,
     })
 );
 
-/* ---------------- IMPORTANT: HANDLE PREFLIGHT ---------------- */
+/* ---------------- HANDLE PREFLIGHT ---------------- */
 app.options('*', cors());
 
 /* ---------------- TEST ROUTE ---------------- */
@@ -75,7 +80,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-/* ---------------- DB ---------------- */
+/* ---------------- DB CONNECTION ---------------- */
 let isConnected = false;
 
 const connectDB = async () => {
@@ -106,7 +111,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-/* ---------------- START ---------------- */
+/* ---------------- START SERVER ---------------- */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-/* ---------------- FIX: AUTO SWITCH ENV ---------------- */
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5001'; // fallback for local dev
+/* ---------------- SAFE ENV FALLBACK ---------------- */
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
+/* ---------------- AXIOS INSTANCE ---------------- */
 export const api = axios.create({
     baseURL: API,
     withCredentials: true,
@@ -15,6 +16,6 @@ export const img = (path) => {
     // already full URL
     if (path.startsWith('http')) return path;
 
-    // local dev / production safe URL
-    return `${API}${path}`;
+    // remove double slashes issue
+    return `${API}${path.startsWith('/') ? '' : '/'}${path}`;
 };
