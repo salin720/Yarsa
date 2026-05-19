@@ -81,7 +81,7 @@ export default function List() {
 
                             <td>{p.name}</td>
                             <td>{p.category}</td>
-                            <td>${p.price}</td>
+                            <td>Rs {p.price}</td>
                             <td>{p.stock}</td>
 
                             <td className="actions">

@@ -92,7 +92,7 @@ export default function Orders() {
                         <p>Receipt: {o.receiptNo}</p>
                     </div>
 
-                    <h3>${o.amount}</h3>
+                    <h3>Rs {o.amount}</h3>
 
                     <select
                         value={o.status}

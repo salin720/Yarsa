@@ -28,7 +28,7 @@ export default function Dashboard() {
                 <article>
                     <FiDollarSign />
                     <span>Revenue</span>
-                    <b>${d.revenue}</b>
+                    <b>Rs {d.revenue}</b>
                 </article>
                 <article>
                     <FiShoppingBag />
