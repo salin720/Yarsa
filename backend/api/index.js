@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import serverless from 'serverless-http';
 
 import authRoutes from '../src/routes/auth.js';
 import productRoutes from '../src/routes/products.js';
@@ -14,22 +13,23 @@ dotenv.config();
 
 const app = express();
 
+/* ---------------- MIDDLEWARE ---------------- */
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-// TEST ROUTE
+/* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
     res.json({ message: 'Backend working 🚀' });
 });
 
-// ROUTES
+/* ---------------- ROUTES ---------------- */
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-// SAFE MONGODB CONNECTION (CRASH FIX)
+/* ---------------- MONGODB CONNECTION ---------------- */
 let isConnected = false;
 
 const connectDB = async () => {
@@ -37,29 +37,31 @@ const connectDB = async () => {
         if (isConnected) return;
 
         if (!process.env.MONGO_URI) {
-            console.log('MONGO_URI is missing in Vercel env');
+            console.log('❌ MONGO_URI is missing in environment variables');
             return;
         }
 
         await mongoose.connect(process.env.MONGO_URI);
-        isConnected = true;
 
-        console.log('MongoDB connected');
+        isConnected = true;
+        console.log('✅ MongoDB connected');
     } catch (err) {
-        console.log('Mongo error:', err.message);
+        console.log('❌ MongoDB error:', err.message);
     }
 };
 
-// connect only when request comes
-app.use(async (req, res, next) => {
-    await connectDB();
-    next();
-});
+/* Connect once on startup */
+connectDB();
 
-// ERROR HANDLER (IMPORTANT)
+/* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: 'Server crashed' });
 });
 
-export default serverless(app);
+/* ---------------- START SERVER ---------------- */
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
