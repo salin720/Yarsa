@@ -92,7 +92,7 @@ export default function Product() {
                         <Stars value={p.ratingAvg} /> <b>{p.ratingAvg || 0}</b>{' '}
                         ({p.ratingCount || 0} real reviews)
                     </p>
-                    <h2>Rs{p.price}</h2>
+                    <h2>Rs {p.price}</h2>
                     <p>{p.description}</p>
                     <h3>Select Size</h3>
                     <div className="sizes">

@@ -53,7 +53,7 @@ export default function ProductCard({ p }) {
                     <small>({p.ratingCount || 0})</small>
                 </div>
                 <div className="price-row">
-                    <b>Rs{p.price}</b>
+                    <b>Rs {p.price}</b>
                     <button type="button" onClick={() => add(p, firstSize)}>
                         <FiShoppingBag /> Add
                     </button>
