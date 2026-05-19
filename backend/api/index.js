@@ -13,27 +13,15 @@ dotenv.config();
 
 const app = express();
 
-/* ---------------- ALLOWED ORIGINS ---------------- */
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://yarsa-admin.vercel.app',
-    'https://yarsa-frontend.vercel.app',
-];
-
 /* ---------------- CORS CONFIG ---------------- */
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // allow tools like Postman or server-to-server
-            if (!origin) return callback(null, true);
-
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            } else {
-                return callback(new Error('Not allowed by CORS'));
-            }
-        },
+        origin: [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'https://yarsa-admin.vercel.app',
+            'https://yarsa-frontend.vercel.app',
+        ],
         credentials: true,
     })
 );
@@ -61,7 +49,7 @@ const connectDB = async () => {
         if (isConnected) return;
 
         if (!process.env.MONGO_URI) {
-            console.log('❌ MONGO_URI is missing in environment variables');
+            console.log('❌ MONGO_URI is missing');
             return;
         }
 
@@ -76,10 +64,12 @@ const connectDB = async () => {
 
 connectDB();
 
-/* ---------------- ERROR HANDLER ---------------- */
+/* ---------------- GLOBAL ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
     console.error('Server Error:', err.message);
-    res.status(500).json({ error: err.message || 'Server crashed' });
+    res.status(500).json({
+        error: err.message || 'Server crashed',
+    });
 });
 
 /* ---------------- START SERVER ---------------- */
