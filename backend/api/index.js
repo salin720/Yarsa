@@ -14,38 +14,30 @@ dotenv.config();
 
 const app = express();
 
-/* ---------------- CORS ---------------- */
-app.use(cors({
-    origin: '*',
-    credentials: true
-}));
-
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-/* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
     res.json({ message: 'Backend working 🚀' });
 });
 
-/* ---------------- ROUTES ---------------- */
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-/* ---------------- SAFE MONGO CONNECT ---------------- */
-let isConnected = false;
+// Mongo connect (safe)
+let connected = false;
 
 const connectDB = async () => {
-    if (isConnected) return;
-
+    if (connected) return;
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        isConnected = true;
+        connected = true;
         console.log('MongoDB connected');
     } catch (err) {
-        console.log('Mongo Error:', err.message);
+        console.log(err.message);
     }
 };
 
@@ -54,11 +46,4 @@ app.use(async (req, res, next) => {
     next();
 });
 
-/* ---------------- ERROR HANDLER ---------------- */
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).json({ error: 'Server crashed' });
-});
-
-/* ---------------- EXPORT ---------------- */
 export default serverless(app);
