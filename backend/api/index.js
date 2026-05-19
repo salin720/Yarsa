@@ -17,33 +17,49 @@ const app = express();
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
+// TEST ROUTE
 app.get('/', (req, res) => {
     res.json({ message: 'Backend working 🚀' });
 });
 
+// ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-// Mongo connect (safe)
-let connected = false;
+// SAFE MONGODB CONNECTION (CRASH FIX)
+let isConnected = false;
 
 const connectDB = async () => {
-    if (connected) return;
     try {
+        if (isConnected) return;
+
+        if (!process.env.MONGO_URI) {
+            console.log('MONGO_URI is missing in Vercel env');
+            return;
+        }
+
         await mongoose.connect(process.env.MONGO_URI);
-        connected = true;
+        isConnected = true;
+
         console.log('MongoDB connected');
     } catch (err) {
-        console.log(err.message);
+        console.log('Mongo error:', err.message);
     }
 };
 
+// connect only when request comes
 app.use(async (req, res, next) => {
     await connectDB();
     next();
+});
+
+// ERROR HANDLER (IMPORTANT)
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ error: 'Server crashed' });
 });
 
 export default serverless(app);
