@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import serverless from 'serverless-http';
 
+// Routes
 import authRoutes from '../src/routes/auth.js';
 import productRoutes from '../src/routes/products.js';
 import orderRoutes from '../src/routes/orders.js';
@@ -18,6 +20,7 @@ dotenv.config();
 
 const app = express();
 
+/* ---------------- CORS ---------------- */
 const allowedOrigins = [
     process.env.CLIENT_URL,
     process.env.ADMIN_URL,
@@ -34,7 +37,6 @@ app.use(
             if (!origin || allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
-
             return callback(new Error(`CORS blocked for origin: ${origin}`));
         },
         credentials: true,
@@ -43,28 +45,34 @@ app.use(
 
 app.use(express.json({ limit: '10mb' }));
 
-// Static uploads folder
+/* ---------------- Static Files ---------------- */
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Home route
+/* ---------------- Test Route ---------------- */
 app.get('/', (req, res) => {
     res.json({ message: 'YARSA MERN backend running' });
 });
 
-// API Routes
+/* ---------------- API Routes ---------------- */
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-// MongoDB Connection
-if (!mongoose.connections[0].readyState) {
-    mongoose
-        .connect(process.env.MONGO_URI)
-        .then(() => console.log('MongoDB connected'))
-        .catch((e) => console.error('MongoDB Error:', e.message));
-}
+/* ---------------- MongoDB ---------------- */
+const connectDB = async () => {
+    try {
+        if (mongoose.connection.readyState === 0) {
+            await mongoose.connect(process.env.MONGO_URI);
+            console.log('MongoDB connected');
+        }
+    } catch (error) {
+        console.error('MongoDB Error:', error.message);
+    }
+};
 
-// Export for Vercel
-export default app;
+connectDB();
+
+/* ---------------- VERCEL EXPORT ---------------- */
+export default serverless(app);
