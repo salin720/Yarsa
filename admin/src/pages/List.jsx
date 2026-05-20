@@ -7,8 +7,12 @@ import logo from '../assets/yarsa-logo.jpg';
 
 const getImageUrl = (path) => {
     if (!path) return logo;
+
+    // If image already has full URL
     if (path.startsWith('http')) return path;
-    return `http://localhost:5001${path}`;
+
+    // Use deployed backend URL from .env
+    return `${import.meta.env.VITE_API_URL}${path}`;
 };
 
 export default function List() {
@@ -23,6 +27,7 @@ export default function List() {
             setProducts((prev) =>
                 more ? [...prev, ...res.data.items] : res.data.items
             );
+
             setPage(pg);
             setPages(res.data.pages);
         } catch (err) {
@@ -40,7 +45,9 @@ export default function List() {
 
         try {
             await api.delete('/api/products/' + id);
+
             toast.success('Product deleted');
+
             load();
         } catch (err) {
             console.log(err);
@@ -70,7 +77,7 @@ export default function List() {
                             <td>
                                 <img
                                     src={getImageUrl(p.images?.[0])}
-                                    alt=""
+                                    alt={p.name}
                                     className="product-thumb"
                                     onError={(e) => {
                                         e.currentTarget.onerror = null;

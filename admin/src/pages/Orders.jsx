@@ -6,8 +6,12 @@ import logo from '../assets/yarsa-logo.jpg';
 
 const getImageUrl = (path) => {
     if (!path) return logo;
+
+    // If image already contains full URL
     if (path.startsWith('http')) return path;
-    return `http://localhost:5001${path}`;
+
+    // Use deployed backend URL
+    return `${import.meta.env.VITE_API_URL}${path}`;
 };
 
 export default function Orders() {
@@ -18,9 +22,11 @@ export default function Orders() {
     const load = async (pg = 1, more = false) => {
         try {
             const res = await api.get('/api/orders?page=' + pg + '&limit=20');
+
             setOrders((prev) =>
                 more ? [...prev, ...res.data.items] : res.data.items
             );
+
             setPage(pg);
             setPages(res.data.pages);
         } catch (err) {
@@ -35,8 +41,12 @@ export default function Orders() {
 
     async function status(id, s) {
         try {
-            await api.put('/api/orders/' + id + '/status', { status: s });
+            await api.put('/api/orders/' + id + '/status', {
+                status: s,
+            });
+
             toast.success('Order status updated');
+
             load();
         } catch (err) {
             console.log(err);
@@ -55,7 +65,7 @@ export default function Orders() {
                             <div className="admin-order-item" key={k}>
                                 <img
                                     src={getImageUrl(i.image)}
-                                    alt=""
+                                    alt={i.name}
                                     className="order-product-img"
                                     onError={(e) => {
                                         e.currentTarget.onerror = null;
@@ -65,6 +75,7 @@ export default function Orders() {
 
                                 <div>
                                     <b>{i.name}</b>
+
                                     <p>
                                         Qty: {i.quantity} | Size: {i.size}
                                     </p>
@@ -75,6 +86,7 @@ export default function Orders() {
                         <b>
                             {o.address?.firstName} {o.address?.lastName}
                         </b>
+
                         <p>
                             {o.address?.street}, {o.address?.city}
                             <br />
@@ -86,9 +98,13 @@ export default function Orders() {
                         <p>
                             Items: {o.items.reduce((s, i) => s + i.quantity, 0)}
                         </p>
+
                         <p>Method: {o.paymentMethod}</p>
+
                         <p>Payment: {o.payment ? 'Done' : 'Pending'}</p>
+
                         <p>Date: {new Date(o.date).toLocaleString()}</p>
+
                         <p>Receipt: {o.receiptNo}</p>
                     </div>
 
