@@ -28,19 +28,18 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /* ---------------- STATIC FILES ---------------- */
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// app.use('/assets', express.static(path.join(__dirname, 'assets')));
+/*
+   ❌ REMOVED /uploads (NOT NEEDED AFTER CLOUDINARY)
+   ✔ Keep assets ONLY if you use frontend static images
+*/
 
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
-/* ---------------- CORS (FINAL PRODUCTION FIX) ---------------- */
+/* ---------------- CORS ---------------- */
 app.use(
     cors({
         origin: (origin, callback) => {
-            // allow mobile apps, server requests, postman
+            // allow server-to-server, postman, mobile apps
             if (!origin) return callback(null, true);
 
             const allowed = [
@@ -59,9 +58,9 @@ app.use(
                 return callback(null, true);
             }
 
-            console.log('⚠️ CORS request from:', origin);
+            console.log('⚠️ CORS blocked origin:', origin);
 
-            // DO NOT BLOCK HARD (prevents Render/Vercel random failures)
+            // allow anyway to avoid Render/Vercel random issues
             return callback(null, true);
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -70,16 +69,15 @@ app.use(
     })
 );
 
-/* ---------------- HANDLE PREFLIGHT ---------------- */
-// app.options('*', cors());
-app.options(/.*/, cors());
+/* ---------------- PREFLIGHT ---------------- */
+app.options('*', cors());
 
 /* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
     res.json({ message: 'Backend working 🚀' });
 });
 
-/* ---------------- ROUTES ---------------- */
+/* ---------------- API ROUTES ---------------- */
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -112,6 +110,7 @@ connectDB();
 /* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
     console.error('SERVER ERROR:', err);
+
     res.status(500).json({
         error: err.message || 'Server crashed',
     });

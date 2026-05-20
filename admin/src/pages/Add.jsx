@@ -13,20 +13,31 @@ const empty = {
     stock: 50,
     bestseller: false,
     featured: false,
+    images: [],
 };
+
 export default function Add({ edit = false }) {
     const { id } = useParams();
     const nav = useNavigate();
+
     const [form, setForm] = useState(empty);
     const [sizes, setSizes] = useState([]);
     const [files, setFiles] = useState([null, null, null, null]);
+
+    /* ---------------- LOAD PRODUCT (EDIT MODE) ---------------- */
     useEffect(() => {
-        if (edit && id)
+        if (edit && id) {
             api.get('/api/products/' + id).then((r) => {
-                setForm(r.data);
+                setForm({
+                    ...r.data,
+                    images: r.data.images || [],
+                });
                 setSizes(r.data.sizes || []);
             });
+        }
     }, [edit, id]);
+
+    /* ---------------- HANDLE INPUT CHANGE ---------------- */
     const change = (e) =>
         setForm({
             ...form,
@@ -36,12 +47,20 @@ export default function Add({ edit = false }) {
                     : e.target.value,
         });
 
+    /* ---------------- SUBMIT ---------------- */
     async function submit(e) {
         e.preventDefault();
+
         const fd = new FormData();
-        Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+
+        Object.entries(form).forEach(([k, v]) => {
+            if (k !== 'images') fd.append(k, v);
+        });
+
         fd.set('sizes', JSON.stringify(sizes));
+
         files.filter(Boolean).forEach((f) => fd.append('images', f));
+
         try {
             if (edit) {
                 await api.put('/api/products/' + id, fd);
@@ -49,20 +68,23 @@ export default function Add({ edit = false }) {
             } else {
                 await api.post('/api/products', fd);
                 toast.success('Product added');
+
                 setForm(empty);
                 setSizes([]);
                 setFiles([null, null, null, null]);
-                e.currentTarget.reset();
             }
+
             nav('/list');
-        } catch (e) {
-            toast.error(e.response?.data?.message || 'Product save failed');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Product save failed');
         }
     }
 
     return (
         <form className="add" onSubmit={submit}>
             <h1>{edit ? 'Edit Product' : 'Add Product'}</h1>
+
+            {/* ---------------- IMAGE UPLOAD ---------------- */}
             <h2>Upload Image</h2>
             <div className="uploads">
                 {files.map((f, i) => (
@@ -75,21 +97,25 @@ export default function Add({ edit = false }) {
                                       ? img(form.images[i])
                                       : uploadIcon
                             }
+                            alt="upload"
                         />
                         <input
                             type="file"
                             accept="image/*"
                             onChange={(e) => {
-                                const a = [...files];
-                                a[i] = e.target.files[0];
-                                setFiles(a);
+                                const arr = [...files];
+                                arr[i] = e.target.files[0];
+                                setFiles(arr);
                             }}
                         />
                     </label>
                 ))}
             </div>
+
+            {/* ---------------- PRODUCT INFO ---------------- */}
             <label>Product name</label>
             <input name="name" value={form.name} onChange={change} required />
+
             <label>Product description</label>
             <textarea
                 name="description"
@@ -97,9 +123,11 @@ export default function Add({ edit = false }) {
                 onChange={change}
                 required
             />
+
+            {/* ---------------- CATEGORY ---------------- */}
             <div className="triple">
                 <p>
-                    <label>Product category</label>
+                    <label>Category</label>
                     <select
                         name="category"
                         value={form.category}
@@ -110,8 +138,9 @@ export default function Add({ edit = false }) {
                         <option>Kids</option>
                     </select>
                 </p>
+
                 <p>
-                    <label>Sub category</label>
+                    <label>Sub Category</label>
                     <select
                         name="subCategory"
                         value={form.subCategory}
@@ -122,8 +151,9 @@ export default function Add({ edit = false }) {
                         <option>Winterwear</option>
                     </select>
                 </p>
+
                 <p>
-                    <label>Product Price</label>
+                    <label>Price</label>
                     <input
                         name="price"
                         type="number"
@@ -131,6 +161,7 @@ export default function Add({ edit = false }) {
                         onChange={change}
                     />
                 </p>
+
                 <p>
                     <label>Stock</label>
                     <input
@@ -141,6 +172,8 @@ export default function Add({ edit = false }) {
                     />
                 </p>
             </div>
+
+            {/* ---------------- SIZES ---------------- */}
             <label>Product Sizes</label>
             <div className="sizes">
                 {['S', 'M', 'L', 'XL', 'XXL'].map((s) => (
@@ -160,6 +193,8 @@ export default function Add({ edit = false }) {
                     </button>
                 ))}
             </div>
+
+            {/* ---------------- FLAGS ---------------- */}
             <label className="check">
                 <input
                     name="bestseller"
@@ -169,6 +204,7 @@ export default function Add({ edit = false }) {
                 />{' '}
                 Add to bestseller
             </label>
+
             <label className="check">
                 <input
                     name="featured"
@@ -178,6 +214,7 @@ export default function Add({ edit = false }) {
                 />{' '}
                 Featured on home
             </label>
+
             <button className="black">{edit ? 'UPDATE' : 'ADD'}</button>
         </form>
     );

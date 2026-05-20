@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
-import {api} from '../services/api.js';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { api } from '../services/api.js';
 import ProductCard from '../components/ProductCard.jsx';
 import Title from '../components/Title.jsx';
 import heroBanner from '../assets/hero-banner.jpg';
@@ -10,8 +10,21 @@ export default function Home() {
     const [best, setBest] = useState([]);
 
     useEffect(() => {
-        api.get('/api/products?limit=10').then(r => setLatest(r.data.items));
-        api.get('/api/products?bestseller=true&limit=5').then(r => setBest(r.data.items));
+        const loadData = async () => {
+            try {
+                const [latestRes, bestRes] = await Promise.all([
+                    api.get('/api/products?limit=10'),
+                    api.get('/api/products?bestseller=true&limit=5'),
+                ]);
+
+                setLatest(latestRes.data.items);
+                setBest(bestRes.data.items);
+            } catch (err) {
+                console.log('Home load error:', err);
+            }
+        };
+
+        loadData();
     }, []);
 
     return (
@@ -25,13 +38,17 @@ export default function Home() {
             <Title>LATEST COLLECTIONS</Title>
 
             <div className="grid products">
-                {latest.map(p => <ProductCard key={p._id} p={p} />)}
+                {latest.map((p) => (
+                    <ProductCard key={p._id} p={p} />
+                ))}
             </div>
 
             <Title>BEST SELLERS</Title>
 
             <div className="grid products five">
-                {best.map(p => <ProductCard key={p._id} p={p} />)}
+                {best.map((p) => (
+                    <ProductCard key={p._id} p={p} />
+                ))}
             </div>
         </>
     );

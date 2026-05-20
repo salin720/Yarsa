@@ -20,6 +20,7 @@ function Stars({ value = 0 }) {
 export default function ProductCard({ p }) {
     const { add, toggleWish, inWish } = useStore();
     const firstSize = p.sizes?.[0] || 'M';
+
     return (
         <article className="product-card">
             <Link
@@ -27,8 +28,18 @@ export default function ProductCard({ p }) {
                 className="product-media"
                 aria-label={p.name}
             >
-                <img src={img(p.images?.[0])} alt={p.name} loading="lazy" />
+                <img
+                    src={
+                        Array.isArray(p.images) && p.images.length > 0
+                            ? img(p.images[0])
+                            : '/assets/frontend_assets/p_img1.png'
+                    }
+                    alt={p.name}
+                    loading="lazy"
+                />
+
                 {p.bestseller && <span className="badge">Best Seller</span>}
+
                 <button
                     type="button"
                     className={'wish ' + (inWish(p._id) ? 'active' : '')}
@@ -40,18 +51,22 @@ export default function ProductCard({ p }) {
                     <FiHeart />
                 </button>
             </Link>
+
             <div className="product-info">
                 <p className="product-meta">
                     {p.category} • {p.subCategory}
                 </p>
+
                 <Link to={'/product/' + p._id}>
                     <h3>{p.name}</h3>
                 </Link>
+
                 <div className="rating-row">
                     <Stars value={p.ratingAvg} />
                     <b>{p.ratingAvg || 0}</b>
                     <small>({p.ratingCount || 0})</small>
                 </div>
+
                 <div className="price-row">
                     <b>Rs {p.price}</b>
                     <button type="button" onClick={() => add(p, firstSize)}>

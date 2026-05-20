@@ -5,6 +5,7 @@ const C = createContext();
 
 export const useStore = () => useContext(C);
 
+/* ---------------- SAFE JSON ---------------- */
 const safeParse = (value, fallback) => {
     try {
         return JSON.parse(value || JSON.stringify(fallback));
@@ -13,6 +14,7 @@ const safeParse = (value, fallback) => {
     }
 };
 
+/* ---------------- USER KEY ---------------- */
 const getUserKey = (user) => {
     return user?._id || user?.email || 'guest';
 };
@@ -22,18 +24,21 @@ export function StoreProvider({ children }) {
 
     const currentUserKey = getUserKey(user);
 
+    /* ---------------- CART INIT ---------------- */
     const [cart, setCart] = useState(() => {
         const savedUser = safeParse(localStorage.user, null);
         const key = getUserKey(savedUser);
         return safeParse(localStorage.getItem(`cart_${key}`), []);
     });
 
+    /* ---------------- WISHLIST INIT ---------------- */
     const [wishlist, setWishlist] = useState(() => {
         const savedUser = safeParse(localStorage.user, null);
         const key = getUserKey(savedUser);
         return safeParse(localStorage.getItem(`wishlist_${key}`), []);
     });
 
+    /* ---------------- SYNC ON USER CHANGE ---------------- */
     useEffect(() => {
         const key = getUserKey(user);
 
@@ -41,10 +46,12 @@ export function StoreProvider({ children }) {
         setWishlist(safeParse(localStorage.getItem(`wishlist_${key}`), []));
     }, [user]);
 
+    /* ---------------- SAVE CART ---------------- */
     useEffect(() => {
         localStorage.setItem(`cart_${currentUserKey}`, JSON.stringify(cart));
     }, [cart, currentUserKey]);
 
+    /* ---------------- SAVE WISHLIST ---------------- */
     useEffect(() => {
         localStorage.setItem(
             `wishlist_${currentUserKey}`,
@@ -52,6 +59,7 @@ export function StoreProvider({ children }) {
         );
     }, [wishlist, currentUserKey]);
 
+    /* ---------------- SAVE USER ---------------- */
     useEffect(() => {
         if (user) {
             localStorage.user = JSON.stringify(user);
@@ -60,18 +68,20 @@ export function StoreProvider({ children }) {
         }
     }, [user]);
 
+    /* ---------------- COUNTERS ---------------- */
     const count = cart.reduce((s, i) => s + i.quantity, 0);
     const wishCount = wishlist.length;
 
+    /* ---------------- ADD TO CART ---------------- */
     const add = (product, size = 'M') => {
         setCart((c) => {
-            const k = c.find(
+            const existing = c.find(
                 (x) => x.product === product._id && x.size === size
             );
 
-            if (k) {
+            if (existing) {
                 return c.map((x) =>
-                    x === k ? { ...x, quantity: x.quantity + 1 } : x
+                    x === existing ? { ...x, quantity: x.quantity + 1 } : x
                 );
             }
 
@@ -80,7 +90,12 @@ export function StoreProvider({ children }) {
                 {
                     product: product._id,
                     name: product.name,
-                    image: product.images?.[0],
+
+                    /* ✅ SAFE IMAGE HANDLING FIX */
+                    image: Array.isArray(product.images)
+                        ? product.images[0]
+                        : product.images || '',
+
                     price: product.price,
                     size,
                     quantity: 1,
@@ -91,6 +106,7 @@ export function StoreProvider({ children }) {
         toast.success('Added to cart');
     };
 
+    /* ---------------- UPDATE CART ---------------- */
     const update = (i, q) => {
         setCart((c) =>
             c
@@ -101,17 +117,19 @@ export function StoreProvider({ children }) {
         toast.info('Cart updated');
     };
 
+    /* ---------------- REMOVE ITEM ---------------- */
     const remove = (i) => {
         setCart((c) => c.filter((_, idx) => idx !== i));
         toast.warn('Removed from cart');
     };
 
-    const clear = () => {
-        setCart([]);
-    };
+    /* ---------------- CLEAR CART ---------------- */
+    const clear = () => setCart([]);
 
+    /* ---------------- TOTAL PRICE ---------------- */
     const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
+    /* ---------------- WISHLIST TOGGLE ---------------- */
     const toggleWish = (p) => {
         setWishlist((w) => {
             const exists = w.some((x) => x._id === p._id);
@@ -142,8 +160,10 @@ export function StoreProvider({ children }) {
         });
     };
 
+    /* ---------------- CHECK WISHLIST ---------------- */
     const inWish = (id) => wishlist.some((x) => x._id === id);
 
+    /* ---------------- REMOVE FROM WISHLIST ---------------- */
     const removeWish = (id) => {
         setWishlist((w) => w.filter((x) => x._id !== id));
         toast.info('Removed from wishlist');

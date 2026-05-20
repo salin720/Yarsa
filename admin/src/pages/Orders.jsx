@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { FiPackage } from 'react-icons/fi';
-import { api } from '../services/api.js';
-import logo from '../assets/yarsa-logo.jpg';
-
-const getImageUrl = (path) => {
-    if (!path) return logo;
-
-    // If image already contains full URL
-    if (path.startsWith('http')) return path;
-
-    // Use deployed backend URL
-    return `${import.meta.env.VITE_API_URL}${path}`;
-};
+import { api, img } from '../services/api.js';
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -21,7 +9,7 @@ export default function Orders() {
 
     const load = async (pg = 1, more = false) => {
         try {
-            const res = await api.get('/api/orders?page=' + pg + '&limit=20');
+            const res = await api.get(`/api/orders?page=${pg}&limit=20`);
 
             setOrders((prev) =>
                 more ? [...prev, ...res.data.items] : res.data.items
@@ -41,12 +29,11 @@ export default function Orders() {
 
     async function status(id, s) {
         try {
-            await api.put('/api/orders/' + id + '/status', {
+            await api.put(`/api/orders/${id}/status`, {
                 status: s,
             });
 
             toast.success('Order status updated');
-
             load();
         } catch (err) {
             console.log(err);
@@ -60,22 +47,24 @@ export default function Orders() {
 
             {orders.map((o) => (
                 <div className="order admin-order" key={o._id}>
+                    {/* PRODUCTS SECTION */}
                     <div className="order-products">
-                        {o.items.map((i, k) => (
+                        {o.items?.map((i, k) => (
                             <div className="admin-order-item" key={k}>
                                 <img
-                                    src={getImageUrl(i.image)}
-                                    alt={i.name}
+                                    src={img(i.image)}
+                                    alt={i.name || 'product'}
                                     className="order-product-img"
+                                    loading="lazy"
                                     onError={(e) => {
                                         e.currentTarget.onerror = null;
-                                        e.currentTarget.src = logo;
+                                        e.currentTarget.src =
+                                            '/assets/frontend_assets/p_img1.png';
                                     }}
                                 />
 
                                 <div>
                                     <b>{i.name}</b>
-
                                     <p>
                                         Qty: {i.quantity} | Size: {i.size}
                                     </p>
@@ -94,22 +83,31 @@ export default function Orders() {
                         </p>
                     </div>
 
+                    {/* ORDER DETAILS */}
                     <div>
                         <p>
-                            Items: {o.items.reduce((s, i) => s + i.quantity, 0)}
+                            Items:{' '}
+                            {o.items?.reduce(
+                                (s, i) => s + (i.quantity || 0),
+                                0
+                            )}
                         </p>
 
                         <p>Method: {o.paymentMethod}</p>
 
                         <p>Payment: {o.payment ? 'Done' : 'Pending'}</p>
 
-                        <p>Date: {new Date(o.date).toLocaleString()}</p>
+                        <p>
+                            Date:{' '}
+                            {o.date ? new Date(o.date).toLocaleString() : 'N/A'}
+                        </p>
 
-                        <p>Receipt: {o.receiptNo}</p>
+                        <p>Receipt: {o.receiptNo || 'N/A'}</p>
                     </div>
 
                     <h3>Rs {o.amount}</h3>
 
+                    {/* STATUS CONTROL */}
                     <select
                         value={o.status}
                         onChange={(e) => status(o._id, e.target.value)}
@@ -123,6 +121,7 @@ export default function Orders() {
                 </div>
             ))}
 
+            {/* PAGINATION */}
             {page < pages && (
                 <button className="black" onClick={() => load(page + 1, true)}>
                     Load More Orders

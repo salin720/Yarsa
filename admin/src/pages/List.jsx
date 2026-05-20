@@ -5,14 +5,28 @@ import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { api } from '../services/api.js';
 import logo from '../assets/yarsa-logo.jpg';
 
+/* ---------------- SAFE IMAGE HANDLER ---------------- */
 const getImageUrl = (path) => {
     if (!path) return logo;
 
-    // If image already has full URL
+    // if backend ever sends array (safety)
+    if (Array.isArray(path)) path = path[0];
+
+    // invalid type safety
+    if (typeof path !== 'string') return logo;
+
+    // already full URL
     if (path.startsWith('http')) return path;
 
-    // Use deployed backend URL from .env
-    return `${import.meta.env.VITE_API_URL}${path}`;
+    // frontend assets fallback
+    if (path.startsWith('/assets')) return path;
+
+    // backend base URL
+    const base = import.meta.env.VITE_API_URL || '';
+
+    return `${base.replace(/\/$/, '')}${
+        path.startsWith('/') ? '' : '/'
+    }${path}`;
 };
 
 export default function List() {
@@ -20,9 +34,10 @@ export default function List() {
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
 
+    /* ---------------- LOAD PRODUCTS ---------------- */
     const load = async (pg = 1, more = false) => {
         try {
-            const res = await api.get('/api/products?page=' + pg + '&limit=20');
+            const res = await api.get(`/api/products?page=${pg}&limit=20`);
 
             setProducts((prev) =>
                 more ? [...prev, ...res.data.items] : res.data.items
@@ -40,15 +55,16 @@ export default function List() {
         load();
     }, []);
 
+    /* ---------------- DELETE PRODUCT ---------------- */
     async function del(id) {
-        if (!confirm('Delete product?')) return;
+        if (!window.confirm('Delete product?')) return;
 
         try {
             await api.delete('/api/products/' + id);
 
             toast.success('Product deleted');
 
-            load();
+            load(); // reload list
         } catch (err) {
             console.log(err);
             toast.error('Delete failed');
