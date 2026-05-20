@@ -28,8 +28,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /* ---------------- STATIC FILES ---------------- */
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
 /* ---------------- CORS (FINAL PRODUCTION FIX) ---------------- */
 app.use(
@@ -66,7 +71,8 @@ app.use(
 );
 
 /* ---------------- HANDLE PREFLIGHT ---------------- */
-app.options('*', cors());
+// app.options('*', cors());
+app.options(/.*/, cors());
 
 /* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
