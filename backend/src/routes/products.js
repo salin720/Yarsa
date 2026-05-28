@@ -1,7 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import { auth, admin } from '../middleware/auth.js';
-import upload from '../middleware/upload.js'; // ✅ CLOUDINARY UPLOAD
+import upload from '../middleware/upload.js'; // ✅ Cloudinary multer
 
 const r = express.Router();
 
@@ -55,7 +55,7 @@ r.get('/', async (req, res) => {
     }
 });
 
-/* ---------------- FEATURED PRODUCTS ---------------- */
+/* ---------------- FEATURED ---------------- */
 r.get('/featured', async (req, res) => {
     try {
         const items = await Product.find({ featured: true }).limit(10);
@@ -85,8 +85,12 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
     try {
         const b = req.body;
 
-        // ✅ Cloudinary gives real URLs here
+        // 🔥 DEBUG STEP (IMPORTANT)
+        console.log('FILES RECEIVED:', req.files);
+
         const images = (req.files || []).map((file) => file.path);
+
+        console.log('IMAGES SAVED:', images);
 
         const product = await Product.create({
             name: b.name,
@@ -103,6 +107,7 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
 
         res.json(product);
     } catch (err) {
+        console.log('CREATE PRODUCT ERROR:', err);
         res.status(500).json({ message: err.message });
     }
 });
@@ -125,8 +130,9 @@ r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
         if (b.price) update.price = +b.price;
         if (b.stock) update.stock = +b.stock;
 
-        // ✅ Replace images only if new ones uploaded
+        // ✅ only replace images if new ones uploaded
         if (req.files && req.files.length > 0) {
+            console.log('NEW IMAGES UPLOADED:', req.files);
             update.images = req.files.map((file) => file.path);
         }
 
@@ -136,6 +142,7 @@ r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
 
         res.json(product);
     } catch (err) {
+        console.log('UPDATE ERROR:', err);
         res.status(500).json({ message: err.message });
     }
 });
@@ -164,9 +171,9 @@ r.post('/:id/reviews', auth, async (req, res) => {
         );
 
         if (exists) {
-            return res
-                .status(400)
-                .json({ message: 'Already reviewed this product' });
+            return res.status(400).json({
+                message: 'Already reviewed this product',
+            });
         }
 
         product.reviews.push({
