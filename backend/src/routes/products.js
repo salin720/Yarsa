@@ -1,9 +1,7 @@
 import express from 'express';
-import multer from 'multer';
 import Product from '../models/Product.js';
 import { auth, admin } from '../middleware/auth.js';
-
-const upload = multer({ storage: multer.memoryStorage() });
+import upload from '../middleware/upload.js'; // ✅ CLOUDINARY UPLOAD
 
 const r = express.Router();
 
@@ -23,10 +21,8 @@ r.get('/', async (req, res) => {
         let q = {};
 
         if (category) q.category = { $in: String(category).split(',') };
-
         if (subCategory)
             q.subCategory = { $in: String(subCategory).split(',') };
-
         if (bestseller) q.bestseller = true;
 
         if (search) {
@@ -37,7 +33,6 @@ r.get('/', async (req, res) => {
         }
 
         let s = { createdAt: -1 };
-
         if (sort === 'low-high') s = { price: 1 };
         if (sort === 'high-low') s = { price: -1 };
         if (sort === 'rating') s = { ratingAvg: -1 };
@@ -60,30 +55,38 @@ r.get('/', async (req, res) => {
     }
 });
 
-/* ---------------- FEATURED ---------------- */
+/* ---------------- FEATURED PRODUCTS ---------------- */
 r.get('/featured', async (req, res) => {
-    const items = await Product.find({ featured: true }).limit(10);
-    res.json(items);
-});
-
-/* ---------------- GET SINGLE ---------------- */
-r.get('/:id', async (req, res) => {
     try {
-        const p = await Product.findById(req.params.id);
-        if (!p) return res.status(404).json({ message: 'Product not found' });
-        res.json(p);
+        const items = await Product.find({ featured: true }).limit(10);
+        res.json(items);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-/* ---------------- CREATE PRODUCT ---------------- */
+/* ---------------- SINGLE PRODUCT ---------------- */
+r.get('/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.json(product);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/* ---------------- CREATE PRODUCT (CLOUDINARY FIXED) ---------------- */
 r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
     try {
         const b = req.body;
 
-        // IMPORTANT: Cloudinary will give req.files[i].path
-        const uploaded = (req.files || []).map((file) => file.path);
+        // ✅ Cloudinary gives real URLs here
+        const images = (req.files || []).map((file) => file.path);
 
         const product = await Product.create({
             name: b.name,
@@ -95,7 +98,7 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
             bestseller: b.bestseller === 'true',
             featured: b.featured === 'true',
             stock: +(b.stock || 50),
-            images: uploaded,
+            images,
         });
 
         res.json(product);
@@ -104,27 +107,34 @@ r.post('/', auth, admin, upload.array('images', 4), async (req, res) => {
     }
 });
 
-/* ---------------- UPDATE PRODUCT ---------------- */
+/* ---------------- UPDATE PRODUCT (CLOUDINARY FIXED) ---------------- */
 r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
     try {
         const b = req.body;
 
-        let update = { ...b };
+        let update = {
+            name: b.name,
+            description: b.description,
+            category: b.category,
+            subCategory: b.subCategory,
+            bestseller: b.bestseller === 'true',
+            featured: b.featured === 'true',
+        };
 
         if (b.sizes) update.sizes = JSON.parse(b.sizes);
         if (b.price) update.price = +b.price;
         if (b.stock) update.stock = +b.stock;
 
-        // Cloudinary images
-        if (req.files?.length) {
+        // ✅ Replace images only if new ones uploaded
+        if (req.files && req.files.length > 0) {
             update.images = req.files.map((file) => file.path);
         }
 
-        const p = await Product.findByIdAndUpdate(req.params.id, update, {
+        const product = await Product.findByIdAndUpdate(req.params.id, update, {
             new: true,
         });
 
-        res.json(p);
+        res.json(product);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -132,43 +142,50 @@ r.put('/:id', auth, admin, upload.array('images', 4), async (req, res) => {
 
 /* ---------------- DELETE PRODUCT ---------------- */
 r.delete('/:id', auth, admin, async (req, res) => {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Product deleted' });
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Product deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 /* ---------------- REVIEWS ---------------- */
 r.post('/:id/reviews', auth, async (req, res) => {
     try {
-        const p = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id);
 
-        if (!p) return res.status(404).json({ message: 'Product not found' });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
 
-        const exists = p.reviews.find(
-            (x) => String(x.user) === String(req.user._id)
+        const exists = product.reviews.find(
+            (r) => String(r.user) === String(req.user._id)
         );
 
         if (exists) {
-            return res.status(400).json({
-                message: 'You already reviewed this product',
-            });
+            return res
+                .status(400)
+                .json({ message: 'Already reviewed this product' });
         }
 
-        p.reviews.push({
+        product.reviews.push({
             user: req.user._id,
             name: req.user.name,
             rating: +req.body.rating,
             comment: req.body.comment,
         });
 
-        p.ratingCount = p.reviews.length;
+        product.ratingCount = product.reviews.length;
 
-        p.ratingAvg = +(
-            p.reviews.reduce((a, b) => a + b.rating, 0) / p.reviews.length
+        product.ratingAvg = +(
+            product.reviews.reduce((a, b) => a + b.rating, 0) /
+            product.reviews.length
         ).toFixed(1);
 
-        await p.save();
+        await product.save();
 
-        res.json(p);
+        res.json(product);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
