@@ -16,7 +16,7 @@ dotenv.config();
 
 const app = express();
 
-/* ---------------- TRUST PROXY (RENDER FIX) ---------------- */
+/* ---------------- TRUST PROXY (Render Fix) ---------------- */
 app.set('trust proxy', 1);
 
 /* ---------------- PATH FIX ---------------- */
@@ -29,20 +29,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /* ---------------- STATIC FILES ---------------- */
 /*
-   ❌ REMOVED /uploads (NOT NEEDED AFTER CLOUDINARY)
-   ✔ Keep assets ONLY if you use frontend static images
+   Cloudinary is used for images now.
+   So NO /uploads needed anymore.
 */
-
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
-/* ---------------- CORS ---------------- */
+/* ---------------- CORS CONFIG ---------------- */
 app.use(
     cors({
         origin: (origin, callback) => {
-            // allow server-to-server, postman, mobile apps
             if (!origin) return callback(null, true);
 
-            const allowed = [
+            const allowedOrigins = [
                 'http://localhost:5173',
                 'http://localhost:3000',
                 'https://yarsa-admin.vercel.app',
@@ -50,17 +48,18 @@ app.use(
                 'https://yarsa-frontend.vercel.app',
             ];
 
-            if (
-                allowed.includes(origin) ||
+            const isAllowed =
+                allowedOrigins.includes(origin) ||
                 origin.includes('vercel.app') ||
-                origin.includes('localhost')
-            ) {
+                origin.includes('localhost');
+
+            if (isAllowed) {
                 return callback(null, true);
             }
 
             console.log('⚠️ CORS blocked origin:', origin);
 
-            // allow anyway to avoid Render/Vercel random issues
+            // Allow anyway (avoids deployment issues)
             return callback(null, true);
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -74,7 +73,9 @@ app.options('*', cors());
 
 /* ---------------- TEST ROUTE ---------------- */
 app.get('/', (req, res) => {
-    res.json({ message: 'Backend working 🚀' });
+    res.json({
+        message: '🚀 YARSA Backend is running successfully',
+    });
 });
 
 /* ---------------- API ROUTES ---------------- */
@@ -84,7 +85,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/esewa', esewaRoutes);
 
-/* ---------------- DB CONNECTION ---------------- */
+/* ---------------- DATABASE CONNECTION ---------------- */
 let isConnected = false;
 
 const connectDB = async () => {
@@ -92,16 +93,16 @@ const connectDB = async () => {
         if (isConnected) return;
 
         if (!process.env.MONGO_URI) {
-            console.log('❌ MONGO_URI missing');
+            console.log('❌ MONGO_URI missing in environment variables');
             return;
         }
 
         await mongoose.connect(process.env.MONGO_URI);
 
         isConnected = true;
-        console.log('✅ MongoDB connected');
+        console.log('✅ MongoDB connected successfully');
     } catch (err) {
-        console.log('❌ MongoDB error:', err.message);
+        console.log('❌ MongoDB connection error:', err.message);
     }
 };
 
@@ -109,10 +110,10 @@ connectDB();
 
 /* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
-    console.error('SERVER ERROR:', err);
+    console.error('❌ SERVER ERROR:', err);
 
     res.status(500).json({
-        error: err.message || 'Server crashed',
+        error: err.message || 'Internal Server Error',
     });
 });
 
