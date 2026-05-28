@@ -7,8 +7,11 @@ router.post('/initiate', (req, res) => {
     const { amount, orderId } = req.body;
 
     const totalAmount = Number(amount).toFixed(2);
+
     const transactionUuid = orderId || `YARSA-${Date.now()}`;
+
     const productCode = 'EPAYTEST';
+
     const secretKey = '8gBm/:&EnhH.1/q';
 
     const signedFieldNames = 'total_amount,transaction_uuid,product_code';
@@ -28,8 +31,12 @@ router.post('/initiate', (req, res) => {
         product_code: productCode,
         product_service_charge: '0',
         product_delivery_charge: '0',
-        success_url: 'http://localhost:5173/payment-success',
-        failure_url: 'http://localhost:5173/payment-failed',
+
+        // ✅ FIXED URLS
+        success_url: 'https://yarsa.vercel.app/payment-success',
+
+        failure_url: 'https://yarsa.vercel.app/payment-failed',
+
         signed_field_names: signedFieldNames,
         signature,
     });
